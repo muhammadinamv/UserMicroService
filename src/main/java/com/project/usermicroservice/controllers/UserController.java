@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private UserService userService;
     public UserController(UserService userService){
-        this.userService = userService;
+        this.userService=userService;
     }
     @PostMapping("/signUp")
     public UserDto signUp(@RequestBody SignUpDto signUpDto) throws Exception{
@@ -26,12 +26,21 @@ public class UserController {
         return userDto;
     }
     @PostMapping("/login")
-    public Token login(@RequestBody LoginDto loginDto){
-        return null;
+    public TokenDto login(@RequestBody LoginDto loginDto) throws Exception{
+        Token token = userService.login(loginDto.getEmail(),
+                                        loginDto.getPassword());
+        TokenDto tokenDto = new TokenDto();
+        tokenDto.setValue(token.getValue());
+        return tokenDto;
     }
     @PostMapping("/validate/{token}")
-    public UserDto validateToken(@PathVariable String token){
-        return null;
+    public UserDto validateToken(@PathVariable String token) throws Exception{
+        User user = userService.validateToken(token);
+        UserDto userDto = new UserDto();
+        userDto.setName(user.getName());
+        userDto.setEmail(user.getEmail());
+        userDto.setRoles(user.getRoles());
+        return userDto;
     }
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody LogoutRequestDto logoutRequestDto){
