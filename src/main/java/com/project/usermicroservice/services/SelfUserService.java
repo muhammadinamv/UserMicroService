@@ -3,6 +3,7 @@ package com.project.usermicroservice.services;
 import com.project.usermicroservice.exceptions.InCorrectPasswordException;
 import com.project.usermicroservice.exceptions.InValidTokenException;
 import com.project.usermicroservice.exceptions.SignUpException;
+import com.project.usermicroservice.exceptions.TokenExpiredException;
 import com.project.usermicroservice.models.Token;
 import com.project.usermicroservice.models.User;
 import com.project.usermicroservice.repositories.TokenRepository;
@@ -66,7 +67,7 @@ public class SelfUserService implements UserService{
         }
     }
 
-    public User validateToken(String value) throws InValidTokenException{
+    public User validateToken(String value) throws InValidTokenException, TokenExpiredException{
         Optional<Token> optionalToken = tokenRepository.findByValue(value);
         if(optionalToken.isEmpty()){
             throw new InValidTokenException("Invalid Token");
@@ -76,7 +77,7 @@ public class SelfUserService implements UserService{
         if(currentTimestamp.compareTo(token.getExpiryDate())<0 && token.isActive()==true){
             return token.getUser();
         }
-        else throw new InValidTokenException("Invalid Token");
+        else throw new TokenExpiredException("Token Expired");
     }
 
     public String getAlphaNumericString(int n){
